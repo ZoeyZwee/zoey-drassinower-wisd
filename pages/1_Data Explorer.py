@@ -59,9 +59,9 @@ with st.expander("Colour Groups"):
             group_options = df[group_feature].value_counts()
             group_highlight = st.multiselect(
                 label="Highlight Selection",
-                options=group_options.keys(),
+                options=group_options.index,
                 format_func=lambda name: f"{name} ({group_options[name]})",
-                default=group_options if len(group_options) < 5 else None,
+                default=df[group_feature].unique() if (group_options.size < 5) else None,
                 placeholder="Select multiple...",
             )
 

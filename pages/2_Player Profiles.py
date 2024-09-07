@@ -1,6 +1,3 @@
-import pickle
-
-import numpy as np
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,18 +12,16 @@ gp = df.groupby(["batter_name"])
 stats = pd.read_csv("data/WISD stats.csv", index_col="batter_name")
 stats = stats[["pitches_received", "hits", "fouls", "fair_foul_ratio", "avg_xxBA"]]
 
-ranks_low = (
+ranks_low = (  # lower value -> better rank
     stats[["fouls"]]
     .rank(ascending=True, na_option="top", method="min")
 )
-ranks_high = (
+ranks_high = (  # bigger value -> better rank
     stats[["pitches_received", "hits", "fair_foul_ratio", "avg_xxBA"]]
     .rank(ascending=False, na_option="bottom", method="max")
 )
 ranks = pd.concat([ranks_low, ranks_high], axis=1)
 avgs = stats.agg("mean")
-with open("data/WISD tracking.pickle", "rb") as f:
-    tracking_frames = pickle.load(f)
 # endregion Load Data
 
 st.title("Player Profiles")
@@ -102,12 +97,15 @@ with spray_columns[1]:  # league overall
 # region exit velocity
 st.subheader("Exit Velocity")
 exitv_ecdf = FigAx(*plt.subplots())
-exitv_ecdf.ax.ecdf(bat_df.exit_velocity, complementary=False, label=batter, orientation="horizontal")
-exitv_ecdf.ax.ecdf(df.exit_velocity.dropna(), complementary=False, label="League Overall", orientation="horizontal")
-exitv_ecdf.ax.set_ylim(0, 120)
+exitv_ecdf.ax.ecdf(bat_df.exit_velocity, complementary=True, label=batter)
+exitv_ecdf.ax.ecdf(df.exit_velocity.dropna(), complementary=True, label="League Overall")
+
+exitv_ecdf.ax.set_xlim(0, 120)
 exitv_ecdf.ax.legend()
-exitv_ecdf.ax.set_xlabel("Percentile")
-exitv_ecdf.ax.set_ylabel("Exit Velocity (mph)")
+exitv_ecdf.ax.set_xlabel("Exit Velocity (mph)")
+exitv_ecdf.ax.set_ylabel("Portion of Batted Balls Exceeding")
+exitv_ecdf.ax.grid(which="major", linestyle='-')
+exitv_ecdf.ax.grid(which="minor", linestyle="--")
 st.pyplot(exitv_ecdf.fig)
 # endregion exit velocity
 # endregion Stat Graphics
