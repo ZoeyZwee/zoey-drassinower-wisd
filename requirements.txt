@@ -1,0 +1,2 @@
+# streamlit and all dependencies included by default
+matplotlib
