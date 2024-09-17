@@ -44,9 +44,12 @@ with st.expander("Filters"):
             df = df[df.batter_name.isin(batters)]
         elif batter_filter == "exclude":
             df = df[~df.batter_name.isin(batters)]
+
+    if df.size==0:
+        st.markdown("**WARNING:** Dataset is empty after applying filters!")
 # endregion Filters
 # region Colour Groups
-with st.expander("Colour Groups"):
+with st.expander("Group Data"):
     group_feature = st.selectbox(
         label="Group By",
         options=["None", "batter_name", "result"],
@@ -58,7 +61,7 @@ with st.expander("Colour Groups"):
         case _:
             group_options = df[group_feature].value_counts()
             group_highlight = st.multiselect(
-                label="Highlight Selection",
+                label="Select groups to highlight",
                 options=group_options.index,
                 format_func=lambda name: f"{name} ({group_options[name]})",
                 default=df[group_feature].unique() if (group_options.size < 5) else None,
@@ -67,7 +70,7 @@ with st.expander("Colour Groups"):
 
             groups = [(name, df[group_feature] == name) for name in group_highlight]
             groups.insert(0, ("_all", True))
-    st.write("Note: Changing filter settings may cause Colour Groups to reset")
+    st.write("Note: Changing filter settings may cause group settings to reset")
 # endregion Colour Groups
 
 # region Features
@@ -75,17 +78,19 @@ feature_cols = st.columns(2)
 with feature_cols[0]:
     x_feature = st.selectbox(
         label="X",
-        options=["xxBA", "exit_velocity", "head_speed", "launch_angle",
-                 "spray_angle", "bat_elevation", "bat_forward_tilt"],
-        index=3
+        options=["xxBA", "exit_velocity", "head_speed", "head_speed_x", "head_speed_y", "head_speed_z",
+                     "handle_speed", "handle_speed_x", "handle_speed_y", "handle_speed_z", "launch_angle",
+                     "spray_angle", "bat_elevation", "bat_forward_tilt"],
+        index=1
     )
 
     with feature_cols[1]:
         y_feature = st.selectbox(
             label="Y",
-            options=["xxBA", "exit_velocity", "head_speed", "launch_angle",
+            options=["xxBA", "exit_velocity", "head_speed", "head_speed_x", "head_speed_y", "head_speed_z",
+                     "handle_speed", "handle_speed_x", "handle_speed_y", "handle_speed_z", "launch_angle",
                      "spray_angle", "bat_elevation", "bat_forward_tilt"],
-            index=1
+            index=0
         )
 # endregion Features
 # region Data Range
@@ -124,7 +129,8 @@ for label, g in groups:
     ax.scatter(
         (df[g & range_mask])[[x_feature]],
         (df[g & range_mask])[[y_feature]],
-        label=label
+        label=label,
+        s=10
     )
 
 ax.legend()
