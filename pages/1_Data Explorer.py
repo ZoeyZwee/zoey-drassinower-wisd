@@ -3,8 +3,6 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 df = pd.read_csv("data/WISD events.csv")
-df = df[df.parse_error.isna()]
-df = df.drop("parse_error", axis=1)
 df = df[df.has_bat & df.has_hit]
 
 st.title("Data Explorer")

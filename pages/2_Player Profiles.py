@@ -6,8 +6,6 @@ from plots import FigAx
 
 # region Load Data
 df = pd.read_csv("data/WISD events.csv")
-df = df[df.parse_error.isna()]  # only retain rows without parse errors
-df = df.drop("parse_error", axis=1)  # remove parse_error column
 gp = df.groupby(["batter_name"])
 stats = pd.read_csv("data/WISD stats.csv", index_col="batter_name")
 stats = stats[["pitches_received", "hits", "fouls", "fair_foul_ratio", "avg_xxBA"]]
